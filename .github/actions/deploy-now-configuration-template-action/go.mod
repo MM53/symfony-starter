@@ -6,6 +6,7 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/bmatcuk/doublestar/v4 v4.0.2
 	github.com/spf13/cobra v1.3.0
+	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
