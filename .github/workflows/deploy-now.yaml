@@ -31,16 +31,21 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 14.x
-      - name: Make envfile
+      - name: Render templates
         if: ${{ steps.project.outputs.deployment-enabled == 'true' }}
-        uses: fmunirdev/envvar-to-dotenv-action@v0.2.0
-        with:
-          target: .env.local
-          variableNames: APP_ENV,APP_SECRET,APP_DEBUG,DATABASE_URL
+        uses: ./.github/actions/deploy-now-configuration-template-action
         env:
-          APP_DEBUG: 0
-          APP_ENV: prod
-          DATABASE_URL: sqlite:///var/database.sqlite
+          config.appDebug: 0
+#      - name: Make envfile
+#        if: ${{ steps.project.outputs.deployment-enabled == 'true' }}
+#        uses: fmunirdev/envvar-to-dotenv-action@v0.2.0
+#        with:
+#          target: .env.local
+#          variableNames: APP_ENV,APP_SECRET,APP_DEBUG,DATABASE_URL
+#        env:
+#          APP_DEBUG: 0
+#          APP_ENV: prod
+#          DATABASE_URL: sqlite:///var/database.sqlite
       - name: Prepare project environment
         if: ${{ steps.project.outputs.deployment-enabled == 'true' }}
         run: npm ci
