@@ -17,6 +17,9 @@ inputs:
     description: 'A prefix to identify environment variables which will be used to fill the templates'
     required: false
     default: 'config.'
+  config:
+    description: 'data'
+    required: true
 runs:
   using: 'docker'
   image: 'Dockerfile'

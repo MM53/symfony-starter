@@ -36,6 +36,10 @@ jobs:
         uses: ./.github/actions/deploy-now-configuration-template-action
         env:
           config.appDebug: 0
+        with:
+          config:
+            abc: 123
+
 #      - name: Make envfile
 #        if: ${{ steps.project.outputs.deployment-enabled == 'true' }}
 #        uses: fmunirdev/envvar-to-dotenv-action@v0.2.0
