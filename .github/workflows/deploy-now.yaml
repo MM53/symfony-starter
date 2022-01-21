@@ -24,7 +24,7 @@ jobs:
         if: ${{ steps.project.outputs.deployment-enabled == 'true' }}
         uses: php-actions/composer@v6
         with:
-          php_version: 8.0
+          php_version: 8.0.15
           args: --optimize-autoloader
       - name: Setup Node.js v14.x
         if: ${{ steps.project.outputs.deployment-enabled == 'true' }}
