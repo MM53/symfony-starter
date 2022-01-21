@@ -17,8 +17,8 @@ inputs:
     description: 'A prefix to identify environment variables which will be used to fill the templates'
     required: false
     default: 'config.'
-  config:
-    description: 'data'
+  data:
+    description: ''
     required: true
 runs:
   using: 'docker'
@@ -32,3 +32,5 @@ runs:
     - ${{ inputs.output-directory }}
     - '--env-var-prefix'
     - ${{ inputs.env-var-prefix }}
+    - '--data'
+    - ${{ inputs.data }}

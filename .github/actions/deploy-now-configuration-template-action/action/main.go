@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"github.com/Masterminds/sprig"
 	"github.com/bmatcuk/doublestar/v4"
+	"gopkg.in/yaml.v2"
 	"io/fs"
 	"log"
 	"os"
@@ -17,6 +18,7 @@ var (
 	templateExtension string
 	outputDir         string
 	envVarPrefix      string
+	inputData         string
 	copyPermissions   bool
 )
 
@@ -83,6 +85,12 @@ func getDataFromEnvironment() map[string]interface{} {
 		}
 	}
 	return map[string]interface{}{strings.ReplaceAll(envVarPrefix, ".", ""): data}
+}
+
+func parseInputData() map[string]interface{} {
+	var data map[string]interface{}
+	handleError(yaml.Unmarshal([]byte(inputData), &data))
+	return map[string]interface{}{"data": data}
 }
 
 func handleError(err error) {

@@ -37,8 +37,8 @@ jobs:
         env:
           config.appDebug: 0
         with:
-          config:
-            abc: 123
+          data: |
+            appDebug: 1
 
 #      - name: Make envfile
 #        if: ${{ steps.project.outputs.deployment-enabled == 'true' }}
