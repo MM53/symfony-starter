@@ -1,33 +1,15 @@
-package action
+package cmd
 
 import (
 	"bufio"
 	"github.com/Masterminds/sprig"
 	"github.com/bmatcuk/doublestar/v4"
-	"gopkg.in/yaml.v2"
 	"io/fs"
-	"log"
 	"os"
 	"strings"
 	"syscall"
 	"text/template"
 )
-
-var (
-	templateDir       string
-	templateExtension string
-	outputDir         string
-	envVarPrefix      string
-	inputData         string
-	copyPermissions   bool
-)
-
-var templateFunctions = sprig.TxtFuncMap()
-
-func init() {
-	delete(templateFunctions, "env")
-	delete(templateFunctions, "expandenv")
-}
 
 type ConfigurationTemplate struct {
 	Path     string
@@ -38,9 +20,16 @@ type ConfigurationTemplate struct {
 	Template *template.Template
 }
 
-func loadTemplateFiles() []ConfigurationTemplate {
+var templateFunctions = sprig.TxtFuncMap()
+
+func init() {
+	delete(templateFunctions, "env")
+	delete(templateFunctions, "expandenv")
+}
+
+func LoadTemplateFiles(templateDir string, templateExtension string) []ConfigurationTemplate {
 	var templates []ConfigurationTemplate
-	files, err := doublestar.Glob(os.DirFS(templateDir), "**/*.template")
+	files, err := doublestar.Glob(os.DirFS(templateDir), "**/*"+templateExtension)
 	handleError(err)
 	for _, file := range files {
 		subPaths := strings.Split(file, "/")
@@ -62,7 +51,7 @@ func loadTemplateFiles() []ConfigurationTemplate {
 	return templates
 }
 
-func (t ConfigurationTemplate) Fill(data map[string]interface{}) {
+func (t ConfigurationTemplate) Render(data Data, outputDir string, copyPermissions bool) {
 	handleError(os.MkdirAll(joinPath(outputDir, t.Path), os.ModePerm))
 	file, err := os.Create(strings.TrimSuffix(joinPath(outputDir, t.Path, t.Filename), ".template"))
 	handleError(err)
@@ -73,32 +62,4 @@ func (t ConfigurationTemplate) Fill(data map[string]interface{}) {
 		handleError(file.Chown(t.Owner, t.Group))
 		handleError(file.Chmod(t.Mode))
 	}
-}
-
-func getDataFromEnvironment() map[string]interface{} {
-	data := make(map[string]string)
-	for _, env := range os.Environ() {
-		if strings.HasPrefix(env, envVarPrefix) {
-			name := strings.TrimPrefix(strings.Split(env, "=")[0], envVarPrefix)
-			value := strings.Split(env, "=")[1]
-			data[name] = value
-		}
-	}
-	return map[string]interface{}{strings.ReplaceAll(envVarPrefix, ".", ""): data}
-}
-
-func parseInputData() map[string]interface{} {
-	var data map[string]interface{}
-	handleError(yaml.Unmarshal([]byte(inputData), &data))
-	return map[string]interface{}{"data": data}
-}
-
-func handleError(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func joinPath(s ...string) string {
-	return strings.Join(s, "/")
 }
