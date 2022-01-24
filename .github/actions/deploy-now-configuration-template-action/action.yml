@@ -27,7 +27,5 @@ runs:
     - '--output-dir'
     - ${{ inputs.output-directory }}
     - '--data'
-    - |
-      secrets:
-        ${{ inputs.data }}
+    - ${{ inputs.data }}
     - '--copy-permissions'
