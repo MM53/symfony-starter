@@ -20,12 +20,8 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - '--template-dir'
-    - ${{ inputs.template-directory }}
-    - '--template-extension'
-    - ${{ inputs.template-extension }}
-    - '--output-dir'
-    - ${{ inputs.output-directory }}
-    - '--data'
-    - ${{ inputs.data }}
-    - '--copy-permissions'
+    - --template-dir ${{ inputs.template-directory }}
+    - --template-extension ${{ inputs.template-extension }}
+    - --output-dir ${{ inputs.output-directory }}
+    - --data ${{ inputs.data }}
+    - --copy-permissions
