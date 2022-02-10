@@ -34,3 +34,4 @@ runs:
     - '--intermediate-data'
     - '{"dbpasswd": "$DB_PASS"}'
     - '--copy-permissions'
+    - '--github-action'
