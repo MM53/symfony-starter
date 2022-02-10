@@ -1,9 +1,21 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
 	"os"
+	"strings"
 )
+
+type rootConfig struct {
+	templateDir       string
+	templateExtension string
+	inputData         []string
+	intermediateData  []string
+	outputDir         string
+	copyPermissions   bool
+	githubAction      bool
+}
 
 func NewRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
@@ -12,23 +24,31 @@ func NewRootCmd() *cobra.Command {
 		Long:         "",
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			templateDir, templateExtension, inputData, outputDir, copyPermissions, err := readFlags(cmd)
+			config, err := readFlags(cmd)
 
-			templates, err := LoadTemplateFiles(templateDir, templateExtension)
+			templates, err := LoadTemplateFiles(config.templateDir, config.templateExtension)
 			if err != nil {
 				return err
 			}
 
-			data, err := ParseInputData(inputData)
+			var usedValues []string
+			data, err := ParseInputData(config.inputData, config.intermediateData, &usedValues)
 			if err != nil {
 				return err
 			}
 
 			for _, template := range templates {
-				err = template.Render(data, outputDir, copyPermissions)
+				err = template.Render(data, config.outputDir, config.copyPermissions)
 				if err != nil {
 					return err
 				}
+			}
+
+			if config.githubAction {
+				fmt.Printf("::set-output name=used_intermediate_values::%v", strings.Join(usedValues, ","))
+			} else if len(usedValues) > 0 {
+				fmt.Println("Intermediate values used in templates:")
+				fmt.Print(strings.Join(usedValues, "\n"))
 			}
 			return nil
 		},
@@ -37,7 +57,9 @@ func NewRootCmd() *cobra.Command {
 	rootCmd.Flags().StringP("template-extension", "t", ".template", "Set a file extension to detect templates.")
 	rootCmd.Flags().StringP("output-dir", "o", "./", "Set the output directory.")
 	rootCmd.Flags().StringArrayP("data", "d", []string{}, "Data to use for rendering templates as yaml or json objects. Multiple objects will be merged before rendering.")
+	rootCmd.Flags().StringArray("intermediate-data", []string{}, "Same as --data but used values will be printed out after rendering to use them placeholders for another template engine.")
 	rootCmd.Flags().Bool("copy-permissions", false, "Copy the user, group and mode of the template.")
+	rootCmd.Flags().Bool("github-action", false, "Use github action output format.")
 	return rootCmd
 }
 func Execute() {
@@ -46,20 +68,26 @@ func Execute() {
 	}
 }
 
-func readFlags(cmd *cobra.Command) (templateDir string, templateExtension string, inputData []string, outputDir string, copyPermissions bool, err error) {
-	if templateDir, err = cmd.Flags().GetString("template-dir"); err != nil {
+func readFlags(cmd *cobra.Command) (config rootConfig, err error) {
+	if config.templateDir, err = cmd.Flags().GetString("template-dir"); err != nil {
 		return
 	}
-	if templateExtension, err = cmd.Flags().GetString("template-extension"); err != nil {
+	if config.templateExtension, err = cmd.Flags().GetString("template-extension"); err != nil {
 		return
 	}
-	if inputData, err = cmd.Flags().GetStringArray("data"); err != nil {
+	if config.inputData, err = cmd.Flags().GetStringArray("data"); err != nil {
 		return
 	}
-	if outputDir, err = cmd.Flags().GetString("output-dir"); err != nil {
+	if config.intermediateData, err = cmd.Flags().GetStringArray("intermediate-data"); err != nil {
 		return
 	}
-	if copyPermissions, err = cmd.Flags().GetBool("copy-permissions"); err != nil {
+	if config.outputDir, err = cmd.Flags().GetString("output-dir"); err != nil {
+		return
+	}
+	if config.copyPermissions, err = cmd.Flags().GetBool("copy-permissions"); err != nil {
+		return
+	}
+	if config.githubAction, err = cmd.Flags().GetBool("github-action"); err != nil {
 		return
 	}
 	return

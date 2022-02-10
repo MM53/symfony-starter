@@ -16,6 +16,9 @@ inputs:
   data:
     description: 'Data to use for rendering templates as yaml or json objects'
     required: true
+outputs:
+  used_intermediate_values:
+    description: ''
 runs:
   using: 'docker'
   image: 'Dockerfile'
@@ -28,4 +31,8 @@ runs:
     - ${{ inputs.output-directory }}
     - '--data'
     - ${{ inputs.data }}
+    - '--intermediate-data'
+    - |
+      runtime:
+        - dbpasswd: $DB_PASS
     - '--copy-permissions'

@@ -32,6 +32,7 @@ jobs:
         with:
           node-version: 14.x
       - name: Render templates
+        id: template
         if: ${{ steps.project.outputs.deployment-enabled == 'true' }}
         uses: ./.github/actions/deploy-now-configuration-template-action
         env:
@@ -53,6 +54,8 @@ jobs:
 #          APP_DEBUG: 0
 #          APP_ENV: prod
 #          DATABASE_URL: sqlite:///var/database.sqlite
+      - name: Get the output
+        run: echo "Used values ${{ steps.template.outputs.used_intermediate_values }}"
       - name: Prepare project environment
         if: ${{ steps.project.outputs.deployment-enabled == 'true' }}
         run: npm ci
