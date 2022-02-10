@@ -32,5 +32,5 @@ runs:
     - '--data'
     - ${{ inputs.data }}
     - '--intermediate-data'
-    - '{"runtime": {"dbpasswd": "$DB_PASS"}}'
+    - '{"dbpasswd": "$DB_PASS"}'
     - '--copy-permissions'
