@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"gopkg.in/yaml.v3"
 )
@@ -13,6 +14,10 @@ type IntermediateValue struct {
 func (v IntermediateValue) String() string {
 	v.updateUsedValues(v.value)
 	return v.value
+}
+
+func (v IntermediateValue) MarshalJSON() ([]byte, error) {
+	return []byte("\"" + v.value + "\""), nil
 }
 
 type Data map[string]interface{}
@@ -30,7 +35,8 @@ func ParseInputData(input []string, intermediateInput []string, usedValues *[]st
 	}
 	if len(intermediateInput) > 0 {
 		for i := 0; i < len(intermediateInput); i++ {
-			data2, err := parseIntermediateData(intermediateInput[i], usedValues)
+			data2, err := parseData(intermediateInput[i])
+			data2 = data2.convertToIntermediateValues(usedValues)
 			if err != nil {
 				return nil, err
 			}
@@ -46,26 +52,25 @@ func parseData(input string) (Data, error) {
 	return data, err
 }
 
-func parseIntermediateData(input string, usedValues *[]string) (Data, error) {
-	intermediateData, err := parseData(input)
-	if err != nil {
-		return nil, err
-	}
-	data := make(map[string]interface{})
-	for key, value := range intermediateData {
-		data[key] = IntermediateValue{
-			value: fmt.Sprintf("%v", value),
-			updateUsedValues: func(newValue string) {
-				for _, value := range *usedValues {
-					if value == newValue {
-						return
+func (d *Data) convertToIntermediateValues(usedValues *[]string) Data {
+	for key, value := range *d {
+		if subData, ok := value.(Data); ok {
+			subData.convertToIntermediateValues(usedValues)
+		} else {
+			(*d)[key] = IntermediateValue{
+				value: fmt.Sprintf("%v", value),
+				updateUsedValues: func(newValue string) {
+					for _, value := range *usedValues {
+						if value == newValue {
+							return
+						}
 					}
-				}
-				*usedValues = append(*usedValues, newValue)
-			},
+					*usedValues = append(*usedValues, newValue)
+				},
+			}
 		}
 	}
-	return data, nil
+	return *d
 }
 
 func (d *Data) merge(d2 Data) Data {
@@ -81,4 +86,12 @@ func (d *Data) merge(d2 Data) Data {
 		}
 	}
 	return *d
+}
+
+func (d Data) String() string {
+	bytes, err := json.Marshal(d)
+	if err != nil {
+		return err.Error()
+	}
+	return string(bytes)
 }

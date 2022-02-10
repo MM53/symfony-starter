@@ -57,7 +57,7 @@ func NewRootCmd() *cobra.Command {
 	rootCmd.Flags().StringP("template-extension", "t", ".template", "Set a file extension to detect templates.")
 	rootCmd.Flags().StringP("output-dir", "o", "./", "Set the output directory.")
 	rootCmd.Flags().StringArrayP("data", "d", []string{}, "Data to use for rendering templates as yaml or json objects. Multiple objects will be merged before rendering.")
-	rootCmd.Flags().StringArray("intermediate-data", []string{}, "Same as --data but used values will be printed out after rendering to use them placeholders for another template engine.")
+	rootCmd.Flags().StringArray("intermediate-data", []string{}, "Same as --data but used values will be printed out after rendering to use them as placeholders for another template engine.")
 	rootCmd.Flags().Bool("copy-permissions", false, "Copy the user, group and mode of the template.")
 	rootCmd.Flags().Bool("github-action", false, "Use github action output format.")
 	return rootCmd

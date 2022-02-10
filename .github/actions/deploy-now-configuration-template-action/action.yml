@@ -32,6 +32,6 @@ runs:
     - '--data'
     - ${{ inputs.data }}
     - '--intermediate-data'
-    - '{"dbpasswd": "$DB_PASS"}'
+    - '{"runtime": {"db": {"password": "%DB_PASS%"}}}'
     - '--copy-permissions'
     - '--github-action'
