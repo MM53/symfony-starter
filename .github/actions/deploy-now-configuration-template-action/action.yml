@@ -32,7 +32,5 @@ runs:
     - '--data'
     - ${{ inputs.data }}
     - '--intermediate-data'
-    - |
-      runtime:
-        - dbpasswd: $DB_PASS
+    - '{"runtime": {"dbpasswd": "$DB_PASS"}}'
     - '--copy-permissions'
