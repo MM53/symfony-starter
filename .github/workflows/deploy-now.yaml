@@ -39,10 +39,9 @@ jobs:
           config.appDebug: 0
         with:
           data: |
-            secrets:
-              appDebug: 1
-              db:
-                password: secret
+            appDebug: 1
+            db:
+              password: secret
 
 #      - name: Make envfile
 #        if: ${{ steps.project.outputs.deployment-enabled == 'true' }}
