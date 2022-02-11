@@ -27,7 +27,6 @@ runs:
     - '--output-dir'
     - ${{ inputs.output-directory }}
     - '--data'
-    - "secrets:
-  ${{ inputs.data }}"
+    - 'secrets:\n  ${{ inputs.data }}'
     - '--copy-permissions'
     - '--github-action'
