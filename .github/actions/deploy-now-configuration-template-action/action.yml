@@ -16,6 +16,9 @@ inputs:
   secrets:
     description: 'Data to use for rendering templates as yaml or json objects'
     required: true
+outputs:
+  used_runtime_values:
+    description: ''
 runs:
   using: 'docker'
   image: 'Dockerfile'
