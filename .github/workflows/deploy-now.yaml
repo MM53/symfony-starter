@@ -38,7 +38,7 @@ jobs:
         env:
           config.appDebug: 0
         with:
-          data: |
+          secrets: |
             appDebug: 1
             db:
               password: secret
