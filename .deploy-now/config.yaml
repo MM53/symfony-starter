@@ -43,11 +43,11 @@ deploy:
     # commands that are executed at the real webspace NOT at build servers BEFORE copying new files
     pre-deployment-remote-commands:
       - echo "here you could enter maintenance mode..."
-      - type -a php
-      - php --version
+#      - type -a php
+#      - php --version
     post-deployment-remote-commands:
-      - type -a php
-      - php --version
+#      - type -a php
+#      - php --version
       - find $(pwd) -type f -not -path "$(pwd)/logs/*" -exec chmod 664 {} \;
       - find $(pwd) -type d -not -name "logs" -exec chmod 775 {} \;
       - chmod -R o+w var
