@@ -34,9 +34,7 @@ jobs:
       - name: Render templates
         id: template
         if: ${{ steps.project.outputs.deployment-enabled == 'true' }}
-        uses: ./.github/actions/deploy-now-configuration-template-action
-        env:
-          config.appDebug: 0
+        uses: ionos-deploy-now/template-renderer-action@v1
         with:
           secrets: |
             appDebug: 1
